@@ -138,7 +138,12 @@ var _ = Describe("Configuration update", Ordered, Label(tests.LabelClusterMetada
 			namespace, err = env.CreateUniqueNamespace(namespacePrefix)
 			Expect(err).ToNot(HaveOccurred())
 			DeferCleanup(func() error {
-				return env.DeleteNamespace(namespace)
+				return env.CleanupNamespace(
+					namespace,
+					CurrentSpecReport().LeafNodeText,
+					CurrentSpecReport().Failed(),
+					GinkgoWriter,
+				)
 			})
 			AssertCreateCluster(namespace, clusterName, sampleFile, env)
 		})
@@ -164,7 +169,6 @@ var _ = Describe("Configuration update", Ordered, Label(tests.LabelClusterMetada
 		By("verify that work_mem result as expected", func() {
 			// Check that the parameter has been modified in every pod
 			for _, pod := range podList.Items {
-				pod := pod // pin the variable
 				Eventually(func() (int, error, error) {
 					stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &commandTimeout,
 						"psql", "-U", "postgres", "-tAc", "show work_mem")
@@ -204,7 +208,6 @@ var _ = Describe("Configuration update", Ordered, Label(tests.LabelClusterMetada
 		By("verify that connection should success after pg_hba_reload", func() {
 			// The new pg_hba rule should be present in every pod
 			for _, pod := range podList.Items {
-				pod := pod // pin the variable
 				Eventually(func() (string, error) {
 					stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &commandTimeout,
 						"psql", "-U", "postgres", "-tAc",
@@ -243,7 +246,6 @@ var _ = Describe("Configuration update", Ordered, Label(tests.LabelClusterMetada
 		By("verify that shared_buffers setting changed", func() {
 			// Check that the new parameter has been modified in every pod
 			for _, pod := range podList.Items {
-				pod := pod
 				Eventually(func() (int, error, error) {
 					stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &commandTimeout,
 						"psql", "-U", "postgres", "-tAc", "show shared_buffers")
@@ -282,7 +284,6 @@ var _ = Describe("Configuration update", Ordered, Label(tests.LabelClusterMetada
 		By("verify that both parameters have been modified in each pod", func() {
 			// Check that both parameters have been modified in each pod
 			for _, pod := range podList.Items {
-				pod := pod // pin the variable
 				Eventually(func() (int, error, error) {
 					stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &commandTimeout,
 						"psql", "-U", "postgres", "-tAc", "show max_replication_slots")
@@ -343,7 +344,6 @@ var _ = Describe("Configuration update", Ordered, Label(tests.LabelClusterMetada
 			By("verify that max_connections has been decreased in every pod", func() {
 				// Check that the new parameter has been modified in every pod
 				for _, pod := range podList.Items {
-					pod := pod
 					Eventually(func() (int, error, error) {
 						stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &commandTimeout,
 							"psql", "-U", "postgres", "-tAc", "show max_connections")
@@ -385,7 +385,6 @@ var _ = Describe("Configuration update", Ordered, Label(tests.LabelClusterMetada
 			By("verify that the max_connections has been set to default in every pod", func() {
 				// Check that the new parameter has been modified in every pod
 				for _, pod := range podList.Items {
-					pod := pod
 					Eventually(func() (int, error, error) {
 						stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &commandTimeout,
 							"psql", "-U", "postgres", "-tAc", "show max_connections")
@@ -415,7 +414,6 @@ var _ = Describe("Configuration update", Ordered, Label(tests.LabelClusterMetada
 
 		By("check that there is only one entry in pg_ident_file_mappings", func() {
 			for _, pod := range podList.Items {
-				pod := pod // pin the variable
 				if psqlHasIdentView {
 					Eventually(func() (string, error) {
 						stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &commandTimeout,
@@ -435,7 +433,6 @@ var _ = Describe("Configuration update", Ordered, Label(tests.LabelClusterMetada
 
 		By("verify that there are now two entries in pg_ident_file_mappings", func() {
 			for _, pod := range podList.Items {
-				pod := pod // pin the variable
 				if psqlHasIdentView {
 					Eventually(func() (string, error) {
 						stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &commandTimeout,
@@ -483,7 +480,12 @@ var _ = Describe("Configuration update with primaryUpdateMethod", Label(tests.La
 			namespace, err = env.CreateUniqueNamespace(namespacePrefix)
 			Expect(err).ToNot(HaveOccurred())
 			DeferCleanup(func() error {
-				return env.DeleteNamespace(namespace)
+				return env.CleanupNamespace(
+					namespace,
+					CurrentSpecReport().LeafNodeText,
+					CurrentSpecReport().Failed(),
+					GinkgoWriter,
+				)
 			})
 
 			clusterName, err = env.GetResourceNameFromYAML(clusterFileWithPrimaryUpdateRestart)
@@ -619,7 +621,6 @@ var _ = Describe("Configuration update with primaryUpdateMethod", Label(tests.La
 
 				// Check that the parameter has been modified in every pod
 				for _, pod := range podList.Items {
-					pod := pod // pin the variable
 					Eventually(func() (int, error, error) {
 						stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &commandTimeout,
 							"psql", "-U", "postgres", "-tAc", "show work_mem")

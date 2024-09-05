@@ -34,7 +34,7 @@ on:
 
 # set up environment variables to be used across all the jobs
 env:
-  GOLANG_VERSION: "1.22.x"
+  GOLANG_VERSION: "1.23.x"
   KUBEBUILDER_VERSION: "2.3.1"
   KIND_VERSION: "v0.24.0"
   ROOK_VERSION: "v1.14.9"
@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branch: [release-1.22, release-1.23]
+        branch: [release-1.22, release-1.23, release-1.24]
     steps:
       - name: Invoke workflow with inputs
         uses: benc-uk/workflow-dispatch@v1

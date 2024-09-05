@@ -124,7 +124,14 @@ var _ = Describe("Tablespaces tests", Label(tests.LabelTablespaces,
 			// Create a cluster in a namespace we'll delete after the test
 			namespace, err = env.CreateUniqueNamespace(namespacePrefix)
 			Expect(err).ToNot(HaveOccurred())
-
+			DeferCleanup(func() error {
+				return env.CleanupNamespace(
+					namespace,
+					CurrentSpecReport().LeafNodeText,
+					CurrentSpecReport().Failed(),
+					GinkgoWriter,
+				)
+			})
 			// We create the MinIO credentials required to login into the system
 			AssertStorageCredentialsAreCreated(namespace, "backup-storage-creds", "minio", "minio123")
 
@@ -133,9 +140,6 @@ var _ = Describe("Tablespaces tests", Label(tests.LabelTablespaces,
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			DeferCleanup(func() error {
-				return env.DeleteNamespace(namespace)
-			})
 			clusterSetup(clusterManifest)
 		})
 
@@ -391,7 +395,14 @@ var _ = Describe("Tablespaces tests", Label(tests.LabelTablespaces,
 			// Create a cluster in a namespace we'll delete after the test
 			namespace, err = env.CreateUniqueNamespace(namespacePrefix)
 			Expect(err).ToNot(HaveOccurred())
-
+			DeferCleanup(func() error {
+				return env.CleanupNamespace(
+					namespace,
+					CurrentSpecReport().LeafNodeText,
+					CurrentSpecReport().Failed(),
+					GinkgoWriter,
+				)
+			})
 			// We create the required credentials for MinIO
 			AssertStorageCredentialsAreCreated(namespace, "backup-storage-creds", "minio", "minio123")
 
@@ -400,9 +411,6 @@ var _ = Describe("Tablespaces tests", Label(tests.LabelTablespaces,
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			DeferCleanup(func() error {
-				return env.DeleteNamespace(namespace)
-			})
 			clusterSetup(clusterManifest)
 		})
 
@@ -487,7 +495,6 @@ var _ = Describe("Tablespaces tests", Label(tests.LabelTablespaces,
 					backupList, err := env.GetBackupList(namespace)
 					g.Expect(err).ToNot(HaveOccurred())
 					for _, backup := range backupList.Items {
-						backup := backup
 						if backup.Name != backupName {
 							continue
 						}
@@ -631,7 +638,12 @@ var _ = Describe("Tablespaces tests", Label(tests.LabelTablespaces,
 			namespace, err = env.CreateUniqueNamespace(namespacePrefix)
 			Expect(err).ToNot(HaveOccurred())
 			DeferCleanup(func() error {
-				return env.DeleteNamespace(namespace)
+				return env.CleanupNamespace(
+					namespace,
+					CurrentSpecReport().LeafNodeText,
+					CurrentSpecReport().Failed(),
+					GinkgoWriter,
+				)
 			})
 			clusterSetup(clusterManifest)
 		})
@@ -769,7 +781,12 @@ var _ = Describe("Tablespaces tests", Label(tests.LabelTablespaces,
 			namespace, err = env.CreateUniqueNamespace(namespacePrefix)
 			Expect(err).ToNot(HaveOccurred())
 			DeferCleanup(func() error {
-				return env.DeleteNamespace(namespace)
+				return env.CleanupNamespace(
+					namespace,
+					CurrentSpecReport().LeafNodeText,
+					CurrentSpecReport().Failed(),
+					GinkgoWriter,
+				)
 			})
 			clusterSetup(clusterManifest)
 		})

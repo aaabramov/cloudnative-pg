@@ -142,6 +142,11 @@ func AssertSwitchoverWithHistory(
 		}, timeout).Should(BeTrue())
 	})
 
+	// After we finish the switchover, we should wait for the cluster to be ready
+	// otherwise, anyone executing this may not wait and also, the following part of the function
+	// may fail because the switchover hasn't properly finish yet.
+	AssertClusterIsReady(namespace, clusterName, testTimeouts[testsUtils.ClusterIsReady], env)
+
 	if !isReplica {
 		By("confirming that the all postgres containers have *.history file after switchover", func() {
 			pods = []string{}
@@ -2809,7 +2814,6 @@ func AssertPostgresNoPendingRestart(namespace, clusterName string, cmdTimeout ti
 		Eventually(func() (bool, error) {
 			noPendingRestart := true
 			for _, pod := range podList.Items {
-				pod := pod
 				stdout, _, err := env.ExecCommand(env.Ctx, pod, specs.PostgresContainerName, &cmdTimeout,
 					"psql", "-U", "postgres", "-tAc", "SELECT EXISTS(SELECT 1 FROM pg_settings WHERE pending_restart)")
 				if err != nil {
